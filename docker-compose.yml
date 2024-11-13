@@ -26,6 +26,21 @@ services:
     networks:
       - mongo-network
 
+  emotion-detector:
+    build: 
+      context: ./machine-learning-client
+      dockerfile: Dockerfile
+    devices:
+      - /dev/video0:/dev/video0
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    depends_on:
+      - mongodb
+    networks:
+      - mongo-network
+
 networks:
   mongo-network:
     driver: bridge

@@ -6,6 +6,12 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+opencv-python = "*"
+tensorflow = "*"
+keras = "*"
+pymongo = "*"
+numpy = "*"
+fer = "*"
 
 [dev-packages]
 
