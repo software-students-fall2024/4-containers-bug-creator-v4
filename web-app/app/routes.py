@@ -70,7 +70,6 @@ def dashboard():
         return redirect(url_for("login"))
 
     db = Database()
-    result = None
     user_id = session["user"]
 
     if request.method == "POST":
@@ -79,17 +78,17 @@ def dashboard():
             if image_file:
                 # Save the image and get detection result
                 image_data = image_file.read()
-                result = db.save_picture(user_id, image_data)
+                db.save_picture(user_id, image_data)
         elif request.is_json:
             data = request.get_json()
             if "image" in data:
                 image_data = base64.b64decode(data["image"].split(",")[1])
-                result = db.save_picture(user_id, image_data)
+                db.save_picture(user_id, image_data)
 
     # 获取用户的历史记录
     history = db.get_latest_results(user_id)
 
-    return render_template("dashboard.html", result=result, history=history)
+    return render_template("dashboard.html", history=history)
 
 
 @app.route("/images/<image_id>")
