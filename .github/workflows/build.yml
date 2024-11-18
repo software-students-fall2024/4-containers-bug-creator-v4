@@ -26,7 +26,6 @@ jobs:
       working-directory: web-app
       run: |
         pipenv install --dev
-        pipenv install pytest
         pipenv run pytest test_app.py
     - name: Install machine learning dependencies and test
       working-directory: machine-learning-client

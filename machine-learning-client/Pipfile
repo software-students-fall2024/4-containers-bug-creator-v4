@@ -12,8 +12,10 @@ numpy = "*"
 pillow = "*"
 deepface = "*"
 pymongo = "*"
+requests = "*"
 
 [dev-packages]
+pytest = "*"
 pylint = "*"
 black = "*"
 tomli = "*"
