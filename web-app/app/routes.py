@@ -3,12 +3,13 @@ Web application routes module.
 This module defines all the routes and their handling logic.
 """
 
+import io
+import base64
+
 from flask import render_template, request, redirect, url_for, flash, session, send_file
 from app import app
 from app.models import Database
 from werkzeug.security import generate_password_hash, check_password_hash
-import io
-from bson.objectid import ObjectId
 
 
 @app.route("/")
@@ -23,10 +24,10 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        
+
         db = Database()
         user = db.find_user({"email": email})
-        
+
         if user and check_password_hash(user["password"], password):
             session["user"] = email
             return redirect(url_for("dashboard"))
@@ -40,17 +41,14 @@ def register():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        
+
         db = Database()
         if db.find_user({"email": email}):
             flash("Email already exists")
             return redirect(url_for("register"))
-            
+
         hashed_password = generate_password_hash(password)
-        db.add_user({
-            "email": email,
-            "password": hashed_password
-        })
+        db.add_user({"email": email, "password": hashed_password})
         return redirect(url_for("login"))
     return render_template("register.html")
 
@@ -70,35 +68,38 @@ def dashboard():
     """
     if "user" not in session:
         return redirect(url_for("login"))
-        
+
     db = Database()
-    result = None
     user_id = session["user"]
-    
-    if request.method == "POST" and "image" in request.files:
-        image_file = request.files["image"]
-        if image_file:
-            # Save the image and get detection result
-            image_data = image_file.read()
-            result = db.save_picture(user_id, image_data)
-    
+
+    if request.method == "POST":
+        if request.is_json:
+            data = request.get_json()
+            if "image" in data:
+                image_data = base64.b64decode(data["image"].split(",")[1])
+                db.save_picture(user_id, image_data)
+
+        elif "image" in request.files:
+            image_file = request.files["image"]
+            if image_file:
+                # Save the image and get detection result
+                image_data = image_file.read()
+                db.save_picture(user_id, image_data)
+
     # 获取用户的历史记录
     history = db.get_latest_results(user_id)
-    
-    return render_template("dashboard.html", result=result, history=history)
+
+    return render_template("dashboard.html", history=history)
 
 
-@app.route('/images/<image_id>')
+@app.route("/images/<image_id>")
 def get_image(image_id):
     """Get image from database"""
     try:
         db = Database()
         image_data = db.get_image(image_id)
         if image_data:
-            return send_file(
-                io.BytesIO(image_data),
-                mimetype='image/jpeg'
-            )
+            return send_file(io.BytesIO(image_data), mimetype="image/jpeg")
     except Exception as e:
         print(f"Error getting image: {e}")
-    return 'Image not found', 404
+    return "Image not found", 404

@@ -29,7 +29,7 @@ class DatabaseHandler:
             "emotions": emotions,
             "timestamp": datetime.utcnow(),
         }
-        
+
         if user_id:
             document["user_id"] = user_id
 
@@ -47,9 +47,9 @@ class DatabaseHandler:
         """
         collection = self.db.detection_results
         result = collection.find_one({"image_id": image_id})
-        
+
         if result:
             # Convert ObjectId to string for JSON serialization
-            result['_id'] = str(result['_id'])
+            result["_id"] = str(result["_id"])
             return result
         return None

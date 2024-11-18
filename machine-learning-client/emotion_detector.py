@@ -54,37 +54,23 @@ class EmotionDetector:
 
             # Filter and normalize emotions to match our emotion set
             filtered_emotions = {
-                emotion: float(emotions.get(emotion, 0)) 
-                for emotion in self.emotions
+                emotion: float(emotions.get(emotion, 0)) for emotion in self.emotions
             }
 
             # Normalize probabilities to sum to 1
             total = sum(filtered_emotions.values())
             if total > 0:
-                filtered_emotions = {
-                    k: v/total 
-                    for k, v in filtered_emotions.items()
-                }
+                filtered_emotions = {k: v / total for k, v in filtered_emotions.items()}
 
             # Sort emotions by probability
             sorted_emotions = dict(
-                sorted(
-                    filtered_emotions.items(), 
-                    key=lambda x: x[1], 
-                    reverse=True
-                )
+                sorted(filtered_emotions.items(), key=lambda x: x[1], reverse=True)
             )
 
-            return {
-                "status": "success", 
-                "emotions": sorted_emotions
-            }
+            return {"status": "success", "emotions": sorted_emotions}
 
         except Exception as e:
-            return {
-                "status": "error",
-                "error": f"Error processing image: {str(e)}"
-            }
+            return {"status": "error", "error": f"Error processing image: {str(e)}"}
 
     def preprocess_image(self, image_data):
         """
@@ -106,7 +92,7 @@ class EmotionDetector:
 
             # Convert BGR to RGB
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            
+
             return img_rgb
         except Exception as e:
             print(f"Error preprocessing image: {e}")
