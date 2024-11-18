@@ -8,15 +8,6 @@
                 Upload Image
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="image" class="form-label">SELECT IMAGE</label>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Start Detection</button>
-                </form>
-            </div>
-            <div class="card-body">
                 <label for="openCamera" class="form-label">TAKE PHOTO</label>
                 <div class="mb-3">
                     <button id="openCamera" class="btn btn-secondary">Open Camera</button>
@@ -28,6 +19,15 @@
                     <button id="capturePhoto" class="btn btn-primary">Take Photo</button>
                 </div>
                 <canvas id="photo" style="display: none;"></canvas>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">SELECT IMAGE</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Start Detection</button>
+                </form>
             </div>
         </div>
     </div>

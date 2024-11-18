@@ -3,13 +3,13 @@ Web application routes module.
 This module defines all the routes and their handling logic.
 """
 
+import io
+import base64
+
 from flask import render_template, request, redirect, url_for, flash, session, send_file
 from app import app
 from app.models import Database
 from werkzeug.security import generate_password_hash, check_password_hash
-import io
-from bson.objectid import ObjectId
-import base64
 
 
 @app.route("/")
@@ -73,16 +73,17 @@ def dashboard():
     user_id = session["user"]
 
     if request.method == "POST":
-        if "image" in request.files:
+        if request.is_json:
+            data = request.get_json()
+            if "image" in data:
+                image_data = base64.b64decode(data["image"].split(",")[1])
+                db.save_picture(user_id, image_data)
+
+        elif "image" in request.files:
             image_file = request.files["image"]
             if image_file:
                 # Save the image and get detection result
                 image_data = image_file.read()
-                db.save_picture(user_id, image_data)
-        elif request.is_json:
-            data = request.get_json()
-            if "image" in data:
-                image_data = base64.b64decode(data["image"].split(",")[1])
                 db.save_picture(user_id, image_data)
 
     # 获取用户的历史记录

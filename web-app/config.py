@@ -2,7 +2,9 @@
 Configuration settings for the web application.
 This module contains all configuration classes and settings.
 """
+
 import os
+
 
 class Config:  # pylint: disable=too-few-public-methods
     """Application configuration class."""

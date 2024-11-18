@@ -15,13 +15,15 @@ class Database:
 
     def __init__(self):
         """Initialize database connection."""
-        username = os.environ.get('MONGODB_USERNAME', 'admin')
-        password = os.environ.get('MONGODB_PASSWORD', 'password')
-        host = os.environ.get('MONGODB_HOST', 'localhost')
-        port = os.environ.get('MONGODB_PORT', '27017')
-        
+        username = os.environ.get("MONGODB_USERNAME", "admin")
+        password = os.environ.get("MONGODB_PASSWORD", "password")
+        host = os.environ.get("MONGODB_HOST", "localhost")
+        port = os.environ.get("MONGODB_PORT", "27017")
+
         # Create connection URL with authentication
-        connection_string = f"mongodb://{username}:{password}@{host}:{port}/?authSource=admin"        
+        connection_string = (
+            f"mongodb://{username}:{password}@{host}:{port}/?authSource=admin"
+        )
         # Connect to MongoDB with authentication
         self.client = MongoClient(connection_string)
         self.db = self.client.emotion_detection
@@ -39,25 +41,28 @@ class Database:
         """
         try:
             # 获取用户最近的图片记录
-            pictures = self.db.pictures.find(
-                {"user_id": user_id}
-            ).sort("timestamp", -1).limit(limit)
+            pictures = (
+                self.db.pictures.find({"user_id": user_id})
+                .sort("timestamp", -1)
+                .limit(limit)
+            )
 
             results = []
             for pic in pictures:
                 # 获取对应的情绪检测结果
-                detection = self.db.detection_results.find_one({
-                    "user_id": user_id,
-                    "picture_id": str(pic["_id"])
-                })
-                
+                detection = self.db.detection_results.find_one(
+                    {"user_id": user_id, "picture_id": str(pic["_id"])}
+                )
+
                 if detection:
-                    results.append({
-                        'image_url': f'/images/{str(pic["_id"])}',
-                        'emotion': detection['emotions'],
-                        'timestamp': pic['timestamp']
-                    })
-                    
+                    results.append(
+                        {
+                            "image_url": f'/images/{str(pic["_id"])}',
+                            "emotion": detection["emotions"],
+                            "timestamp": pic["timestamp"],
+                        }
+                    )
+
             return results
         except Exception as e:
             print(f"Error getting latest results: {e}")
@@ -106,38 +111,36 @@ class Database:
             pic_doc = {
                 "user_id": user_id,
                 "image": image_data,
-                "timestamp": datetime.now()
+                "timestamp": datetime.now(),
             }
             result = self.db.pictures.insert_one(pic_doc)
             pic_id = str(result.inserted_id)
 
             # 调用 ML Client 的检测接口
-            files = {'image': ('image.jpg', image_data, 'image/jpeg')}
-            data = {'user_id': user_id}
+            files = {"image": ("image.jpg", image_data, "image/jpeg")}
+            data = {"user_id": user_id}
             response = requests.post(
-                'http://ml-client:5001/detect',
-                files=files,
-                data=data
+                "http://ml-client:5001/detect", files=files, data=data
             )
 
             if response.status_code == 200:
                 detection_result = response.json()
-                if detection_result['status'] == 'success':
+                if detection_result["status"] == "success":
                     # 保存检测结果到数据库
                     detection_doc = {
                         "user_id": user_id,
                         "picture_id": pic_id,
-                        "emotions": detection_result['emotions'],
-                        "timestamp": datetime.now()
+                        "emotions": detection_result["emotions"],
+                        "timestamp": datetime.now(),
                     }
                     self.db.detection_results.insert_one(detection_doc)
-                    
+
                     return {
-                        'image_url': f'/images/{pic_id}',
-                        'emotion': detection_result['emotions']
+                        "image_url": f"/images/{pic_id}",
+                        "emotion": detection_result["emotions"],
                     }
             return None
-            
+
         except Exception as e:
             print(f"Error saving picture: {e}")
             return None
@@ -170,9 +173,9 @@ class Database:
             bytes: Image data or None if not found
         """
         try:
-            result = self.db.pictures.find_one({'_id': ObjectId(image_id)})
-            if result and 'image' in result:
-                return result['image']
+            result = self.db.pictures.find_one({"_id": ObjectId(image_id)})
+            if result and "image" in result:
+                return result["image"]
             return None
         except Exception as e:
             print(f"Error getting image: {e}")
