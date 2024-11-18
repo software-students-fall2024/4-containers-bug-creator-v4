@@ -5,16 +5,29 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                Upload image
+                Upload Image
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="image" class="form-label">Select image</label>
+                        <label for="image" class="form-label">SELECT IMAGE</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*">
                     </div>
                     <button type="submit" class="btn btn-primary">Start Detection</button>
                 </form>
+            </div>
+            <div class="card-body">
+                <label for="openCamera" class="form-label">TAKE PHOTO</label>
+                <div class="mb-3">
+                    <button id="openCamera" class="btn btn-secondary">Open Camera</button>
+                </div>
+                <div id="cameraContainer" style="display: none">
+                    <div class="mb-3">
+                        <video id="video" autoplay style="width: 480px; height: 360px; border-radius: 3px;"></video>
+                    </div>
+                    <button id="capturePhoto" class="btn btn-primary">Take Photo</button>
+                </div>
+                <canvas id="photo" style="display: none;"></canvas>
             </div>
         </div>
     </div>
@@ -85,4 +98,47 @@
         </div>
     </div>
 </div>
+
+<script>
+    const openCameraButton = document.querySelector('#openCamera')
+    const cameraContainer = document.querySelector('#cameraContainer')
+    const video = document.querySelector('#video')
+    const captureButton = document.querySelector('#capturePhoto')
+    const photo = document.querySelector('#photo')
+
+    let stream = null
+
+    openCameraButton.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true })
+            video.srcObject = stream
+            cameraContainer.style.display = 'block'
+            openCameraButton.style.display = 'none'
+        } catch (e) {
+            console.error('Error accessing camera:', error)
+        }
+    })
+
+    captureButton.addEventListener('click', () => {
+        if (!stream) return
+
+        const context = photo.getContext('2d')
+        photo.width = video.videoWidth
+        photo.height = video.videoHeight
+        photo.getContext('2d').drawImage(video, 0, 0, photo.width, photo.height)
+
+        const img = photo.toDataURL('image/png')
+
+        fetch('/dashboard', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ image: img })
+        }).catch(error => {
+            console.error('Error uploading photo:', error)
+            alert('Error uploading photo')
+        })
+    })
+</script>
 {% endblock %}
