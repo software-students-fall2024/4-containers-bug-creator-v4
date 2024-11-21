@@ -1,0 +1,28 @@
+name: Machine Learning CI
+
+on:
+ push:
+   branches: [ main, master ]
+ pull_request:
+   branches: [ main, master ]
+
+jobs:
+ build:
+   runs-on: ubuntu-latest
+   strategy:
+     matrix:
+       python-version: ["3.11"]
+
+   steps:
+   - uses: actions/checkout@v4
+   - name: Set up Python 
+     uses: actions/setup-python@v4
+     with:
+       python-version: ${{ matrix.python-version }}
+   - name: Install machine learning dependencies and test
+     working-directory: machine-learning-client
+     run: |
+      pip install -r requirements.txt
+      pip install pytest
+      pytest tests/ -v
+      
