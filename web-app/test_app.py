@@ -77,26 +77,6 @@ def test_upload(client):
     assert response.status_code == 200
 
 
-@patch(
-    "app.models.Database.save_picture",
-    return_value={"image_url": "url", "emotion": {}},
-)
-def test_upload(mock, client):
-    """
-    Test uploading picture files.
-    """
-    mock_image_data = MagicMock()
-    mock_image_data.read.return_value = b"mock_image_data"
-
-    response = client.post(
-        "/upload",
-        data={"image": mock_image_data},
-        content_type="multipart/form-data",
-    )
-
-    assert response.status_code == 200
-
-
 @patch("app.models.Database.get_latest_results", return_value=[])
 def test_camera(mock, client):
     """Test camera page route."""
