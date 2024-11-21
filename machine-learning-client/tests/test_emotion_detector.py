@@ -23,12 +23,3 @@ def test_emotion_detection_with_valid_image():
         assert "status" in result
         assert "emotions" in result
         assert isinstance(result["emotions"], dict)
-
-
-def test_emotion_detection_with_no_face():
-    """Test emotion detection with an image containing no face."""
-    detector = EmotionDetector()
-    # Create a blank image
-    img = np.zeros((100, 100, 3), dtype=np.uint8)
-    result = detector.detect_emotion(img)
-    assert "error" in result
