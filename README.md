@@ -2,8 +2,8 @@
 
 # Emotion Detection System
 
-![ML Client Build Status](https://github.com/software-students-fall2024/4-containers-bug-creator-v4/actions/workflows/event-logger.yml/badge.svg)
-![Web App Build Status](https://github.com/software-students-fall2024/4-containers-bug-creator-v4/actions/workflows/event-logger.yml/badge.svg)
+![ML Client Build Status](https://github.com/software-students-fall2024/4-containers-bug-creator-v4/actions/workflows/machine-learning.yml/badge.svg)
+![Web App Build Status](https://github.com/software-students-fall2024/4-containers-bug-creator-v4/actions/workflows/web-app.yml/badge.svg)
 
 
 ## Project Description
