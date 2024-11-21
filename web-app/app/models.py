@@ -21,9 +21,7 @@ class Database:
         port = os.environ.get("MONGODB_PORT", "27017")
 
         # Create connection URL with authentication
-        connection_string = (
-            f"mongodb://{username}:{password}@{host}:{port}/?authSource=admin"
-        )
+        connection_string = f"mongodb://{username}:{password}@{host}:{port}/?authSource=admin"
         # Connect to MongoDB with authentication
         self.client = MongoClient(connection_string)
         self.db = self.client.emotion_detection
@@ -41,18 +39,12 @@ class Database:
         """
         try:
             # 获取用户最近的图片记录
-            pictures = (
-                self.db.pictures.find({"user_id": user_id})
-                .sort("timestamp", -1)
-                .limit(limit)
-            )
+            pictures = self.db.pictures.find({"user_id": user_id}).sort("timestamp", -1).limit(limit)
 
             results = []
             for pic in pictures:
                 # 获取对应的情绪检测结果
-                detection = self.db.detection_results.find_one(
-                    {"user_id": user_id, "picture_id": str(pic["_id"])}
-                )
+                detection = self.db.detection_results.find_one({"user_id": user_id, "picture_id": str(pic["_id"])})
 
                 if detection:
                     results.append(
@@ -119,9 +111,7 @@ class Database:
             # 调用 ML Client 的检测接口
             files = {"image": ("image.jpg", image_data, "image/jpeg")}
             data = {"user_id": user_id}
-            response = requests.post(
-                "http://ml-client:5001/detect", files=files, data=data
-            )
+            response = requests.post("http://ml-client:5001/detect", files=files, data=data)
 
             if response.status_code == 200:
                 detection_result = response.json()

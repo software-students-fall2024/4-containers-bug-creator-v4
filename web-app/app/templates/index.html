@@ -6,8 +6,44 @@
     <p class="lead">This is a machine learning-based emotion detection system that analyzes the emotional state of people in pictures</p>
     <hr class="my-4">
     {% if session.user %}
-        <p>Click the button below to start using the detection function</p>
-        <a class="btn btn-primary btn-lg" href="/dashboard" role="button">Start detection</a>
+        <p>Please click one of the buttons below to start using the detection function</p>
+        <a class="btn btn-primary btn-lg" href="/upload" role="button">Upload Picture</a>
+        <a class="btn btn-primary btn-lg" href="/camera" role="button">Take Picture</a>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        Detection History
+                    </div>
+                    <div class="card-body">
+                        {% if history %}
+                            <div class="row">
+                            {% for item in history %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="{{ item.image_url }}" class="card-img-top">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                {% for emotion, score in item.emotion.items() %}
+                                                    {{ emotion }}: {{ "%.2f"|format(score) }}<br>
+                                                {% endfor %}
+                                            </p>
+                                            <small class="text-muted">
+                                                {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No detection history available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     {% else %}
         <p>Please login or register to start using the detection function</p>
         <a class="btn btn-primary btn-lg" href="/login" role="button">Login</a>

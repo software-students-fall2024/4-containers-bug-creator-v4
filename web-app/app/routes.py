@@ -6,7 +6,16 @@ This module defines all the routes and their handling logic.
 import io
 import base64
 
-from flask import render_template, request, redirect, url_for, flash, session, send_file
+from flask import (
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    session,
+    send_file,
+    make_response,
+)
 from app import app
 from app.models import Database
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -15,7 +24,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 @app.route("/")
 def index():
     """Render the main page of the application."""
-    return render_template("index.html")
+    db = Database()
+
+    if session["user"]:
+        history = db.get_latest_results(session["user"])
+
+    return render_template("index.html", history=history)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -60,10 +74,34 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route("/dashboard", methods=["GET", "POST"])
-def dashboard():
+@app.route("/upload", methods=["GET", "POST"])
+def upload():
     """
-    Handle dashboard page requests.
+    Handle picture upload requests.
+    Requires user authentication.
+    """
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    db = Database()
+    result = None
+    user_id = session["user"]
+
+    if request.method == "POST" and "image" in request.files:
+        image_file = request.files["image"]
+
+        if image_file:
+            # Save the image and get detection result
+            image_data = image_file.read()
+            result = db.save_picture(user_id, image_data)
+
+    return render_template("upload.html", result=result)
+
+
+@app.route("/camera", methods=["GET", "POST"])
+def camera():
+    """
+    Handle camera requests.
     Requires user authentication.
     """
     if "user" not in session:
@@ -73,23 +111,19 @@ def dashboard():
     user_id = session["user"]
 
     if request.method == "POST":
-        if request.is_json:
-            data = request.get_json()
-            if "image" in data:
+        data = request.get_json()
+
+        if "image" in data:
+            try:
                 image_data = base64.b64decode(data["image"].split(",")[1])
                 db.save_picture(user_id, image_data)
+                return make_response("OK", 200)
+            except Exception as e:
+                return make_response(f"Error saving picture: {e}", 500)
 
-        elif "image" in request.files:
-            image_file = request.files["image"]
-            if image_file:
-                # Save the image and get detection result
-                image_data = image_file.read()
-                db.save_picture(user_id, image_data)
-
-    # 获取用户的历史记录
-    history = db.get_latest_results(user_id)
-
-    return render_template("dashboard.html", history=history)
+    else:
+        latest = db.get_latest_results(session["user"], limit=1)
+        return render_template("camera.html", latest=latest)
 
 
 @app.route("/images/<image_id>")

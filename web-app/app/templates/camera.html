@@ -20,15 +20,6 @@
                 </div>
                 <canvas id="photo" style="display: none;"></canvas>
             </div>
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="image" class="form-label">SELECT IMAGE</label>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Start Detection</button>
-                </form>
-            </div>
         </div>
     </div>
 
@@ -38,12 +29,12 @@
                 Latest Detection Result
             </div>
             <div class="card-body">
-                {% if history and history[0] %}
+                {% if latest and latest[0] %}
                 <div class="result-container">
-                    <img src="{{ history[0].image_url }}" class="img-fluid mb-3">
+                    <img src="{{ latest[0].image_url }}" class="img-fluid mb-3">
                     <h5>Detected emotions:</h5>
                     <div class="emotion-results">
-                        {% for emotion, score in history[0].emotion.items() %}
+                        {% for emotion, score in latest[0].emotion.items() %}
                             <div class="emotion-item">
                                 <span class="emotion-label">{{ emotion }}:</span>
                                 <div class="progress">
@@ -58,41 +49,6 @@
                 </div>
                 {% else %}
                 <p class="text-center">No results found.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                Detection History
-            </div>
-            <div class="card-body">
-                {% if history %}
-                    <div class="row">
-                    {% for item in history %}
-                        <div class="col-md-4 mb-3">
-                            <div class="card">
-                                <img src="{{ item.image_url }}" class="card-img-top">
-                                <div class="card-body">
-                                    <p class="card-text">
-                                        {% for emotion, score in item.emotion.items() %}
-                                            {{ emotion }}: {{ "%.2f"|format(score) }}<br>
-                                        {% endfor %}
-                                    </p>
-                                    <small class="text-muted">
-                                        {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No detection history available.</p>
                 {% endif %}
             </div>
         </div>
@@ -129,7 +85,7 @@
 
         const img = photo.toDataURL('image/png')
 
-        fetch('/dashboard', {
+        fetch('/camera', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
