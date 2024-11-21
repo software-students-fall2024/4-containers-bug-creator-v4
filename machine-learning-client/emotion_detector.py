@@ -53,9 +53,7 @@ class EmotionDetector:
             emotions = result[0]["emotion"]
 
             # Filter and normalize emotions to match our emotion set
-            filtered_emotions = {
-                emotion: float(emotions.get(emotion, 0)) for emotion in self.emotions
-            }
+            filtered_emotions = {emotion: float(emotions.get(emotion, 0)) for emotion in self.emotions}
 
             # Normalize probabilities to sum to 1
             total = sum(filtered_emotions.values())
@@ -63,9 +61,7 @@ class EmotionDetector:
                 filtered_emotions = {k: v / total for k, v in filtered_emotions.items()}
 
             # Sort emotions by probability
-            sorted_emotions = dict(
-                sorted(filtered_emotions.items(), key=lambda x: x[1], reverse=True)
-            )
+            sorted_emotions = dict(sorted(filtered_emotions.items(), key=lambda x: x[1], reverse=True))
 
             return {"status": "success", "emotions": sorted_emotions}
 

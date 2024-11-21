@@ -54,9 +54,7 @@ def test_dashboard_picture(client):
 
     payload = {"image": f"data:image/jpeg;base64,{img_base64}"}
 
-    response = client.post(
-        "/dashboard", data=json.dumps(payload), content_type="application/json"
-    )
+    response = client.post("/dashboard", data=json.dumps(payload), content_type="application/json")
 
     assert response.status_code == 200
 
@@ -66,9 +64,7 @@ def test_dashboard_upload(client):
     with open("tests/test.jpg", "rb") as img_file:
         data = {"image": (img_file, "test.jpg")}
 
-        response = client.post(
-            "/dashboard", data=data, content_type="multipart/form-data"
-        )
+        response = client.post("/dashboard", data=data, content_type="multipart/form-data")
 
     assert response.status_code == 200
 
