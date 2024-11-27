@@ -26,7 +26,9 @@ def index():
     """Render the main page of the application."""
     db = Database()
 
-    if session["user"]:
+    history = None
+
+    if "user" in session:
         history = db.get_latest_results(session["user"])
 
     return render_template("index.html", history=history)
